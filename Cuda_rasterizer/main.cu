@@ -90,16 +90,25 @@ int main(int argc, char * argv[]){
 
     //std::cout << "v0: " << v0_h[0] << std::endl;
 
-    std::ofstream fb;
-    fb.open("./framebuffer.txt");
-    for(int j = 0; j < w; j++){
-        for(int i = 0; i < h; i++){
-            fb << "r: " << (float)framebuffer[i + j*w] << "\n";
-            fb << "g: " << (float)framebuffer[i + j*w + 1] << "\n";
-            fb << "b: " << (float)framebuffer[i + j*w + 2] << "\n";
-        }
-    }
-    fb.close();
+    // std::ofstream fb;
+    // fb.open("./framebuffer.txt");
+    // for(int j = 0; j < w; j++){
+    //     for(int i = 0; i < h; i++){
+    //         fb << "r: " << (float)framebuffer[i + j*w] << "\n";
+    //         fb << "g: " << (float)framebuffer[i + j*w + 1] << "\n";
+    //         fb << "b: " << (float)framebuffer[i + j*w + 2] << "\n";
+    //     }
+    // }
+    // fb.close();
+    // Rgb * new_framebuffer = new Rgb[w * h]; 
+    // for(int i = 0; i < 512; i++){
+    //     for(int j = 0; j < 512; j++){
+    //         new_framebuffer[j + i*w][0] = framebuffer[j + i*w*3];
+    //         new_framebuffer[j + i*w][1] = framebuffer[j + i*w*3 + 1];
+    //         new_framebuffer[j + i*w][2] = framebuffer[j + i*w*3 + 2];
+    //     }
+    // }
+    //memcpy(new_framebuffer,framebuffer,w * h * 3);
 
 
     cudaDeviceSynchronize();

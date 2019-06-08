@@ -17,8 +17,8 @@ __global__ void rasterize_triangle(unsigned char * framebuffer_d, const float * 
         
         int tx = threadIdx.x;
         int ty = threadIdx.y;
-        int row = ty + blockIdx.y * blockDim.y;
-        int col = tx + blockIdx.x * blockDim.x;
+        int j = ty + blockIdx.y * blockDim.y; // rows
+        int i = tx + blockIdx.x * blockDim.x; // cols
 
  
 
@@ -27,33 +27,30 @@ __global__ void rasterize_triangle(unsigned char * framebuffer_d, const float * 
         Vec2 c = {v2_d[0], v2_d[1]};
 
         float area = edgeFunction(a,b,c);
-        for(int j = threadIdx.y; j < 512; j += blockDim.y){
-            for(int i = threadIdx.x; i < 512; i += blockDim.x){
-                Vec2 p = {i + 0.5f, j + 0.5f};
-                int index = i + j * w * 3;   
-                float alpha = edgeFunction(b,c,p);
-                float beta = edgeFunction(c,a,p);
-                float gamma = edgeFunction(a,b,p);
-                if(alpha >= 0 && beta >= 0 && gamma >= 0){
-                    alpha = alpha / area;
-                    beta = beta / area;
-                    gamma = gamma / area;
-                    float r = alpha;
-                    float g = beta;
-                    float bb = gamma;
-                    framebuffer_d[index] = (unsigned char)(r * 255);
-                    framebuffer_d[index + 1] = (unsigned char)(g * 255);
-                    framebuffer_d[index + 2] = (unsigned char)(bb * 255);
-                }
+        //for(int j = threadIdx.y; j < w; j += blockDim.y){
+        //    for(int i = threadIdx.x; i < h; i += blockDim.x){
+        //for(int idx = 0; idx < w; idx++){
+        Vec2 p = {i + 0.5f, j + 0.5f};
+        int index = (i + j * w)*3;   
+        float alpha = edgeFunction(b,c,p);
+        float beta = edgeFunction(c,a,p);
+        float gamma = edgeFunction(a,b,p);
+        if(alpha >= 0 && beta >= 0 && gamma >= 0){
+            alpha = alpha / area;
+            beta = beta / area;
+            gamma = gamma / area;
+            float r = alpha;
+            float g = beta;
+            float bb = gamma;
+            if(i < 512 && j < 512){
+                framebuffer_d[index] = (unsigned char)(r * 255);
+                framebuffer_d[index + 1] = (unsigned char)(g * 255);
+                framebuffer_d[index + 2] = (unsigned char)(bb * 255);
             }
         }
-        // }
-        //framebuffer_d[tx] = arr[0][ty];
-        // int ty = threadIdx.y;
-        // for(int i = 0; i < 10; i++)
-        //     framebuffer_d[i] = ty;
-        //int index = threadIdx.x + blockDim.x*blockIdx.x;
-        //framebuffer_d[index] = threadIdx.x;
+            //}
+            //}
+        //}
 
 }
 
@@ -61,7 +58,7 @@ void basicTriRast(unsigned char * framebuffer_d, const float * v0_d, const float
     //dim3 DimGrid(ceil((w*h)/512.0),1,1);
     const unsigned int BLOCK_SIZE = 32;
     //ceil(double(512)/BLOCK_SIZE)
-    dim3 BlocksPerGrid(6,6,1);
+    dim3 BlocksPerGrid(ceil(double(512)/BLOCK_SIZE),ceil(double(512)/BLOCK_SIZE),1);
     dim3 ThreadsPerBlock(BLOCK_SIZE,BLOCK_SIZE,1);
     // dim3 ThreadsPerBlock(256,1,1);
     // dim3 BlocksPerGrid(ceil(double(SIZE)/BLOCK_SIZE),1,1);
