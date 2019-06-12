@@ -6,6 +6,7 @@
 #include "kernel.cu"
 #include "support.cu"
 
+
 typedef float Vec2[2]; 
 typedef float Vec3[3]; 
 typedef unsigned char Rgb[3]; 
@@ -13,13 +14,15 @@ typedef unsigned char Rgb[3];
 #define w 512
 #define h 512
 
+//using namespace std::chrono;
+
 // inline 
 // float edgeFunction(const Vec2 &a, const Vec2 &b, const Vec2 &c) 
 // { return (c[0] - a[0]) * (b[1] - a[1]) - (c[1] - a[1]) * (b[0] - a[0]); } 
  
 
 int main(int argc, char * argv[]){
-
+    Timer timer;
 
     srand(217);
     int num_triangles = 0;
@@ -89,7 +92,8 @@ int main(int argc, char * argv[]){
     cudaDeviceSynchronize();
 
     //copying host to device
-    printf("copying host to device...\n"); fflush(stdout);
+    printf("copying host to device..."); fflush(stdout);
+    startTime(&timer);
     cudaMemcpy(framebuffer_device, framebuffer, w * h * 3, cudaMemcpyHostToDevice);
     cudaMemcpy(x0_d, x0, sizeof(float) * num_triangles, cudaMemcpyHostToDevice);
     cudaMemcpy(x1_d, x1, sizeof(float) * num_triangles, cudaMemcpyHostToDevice);
@@ -99,14 +103,21 @@ int main(int argc, char * argv[]){
     cudaMemcpy(y2_d, y2, sizeof(float) * num_triangles, cudaMemcpyHostToDevice);
 
     cudaDeviceSynchronize();
+    stopTime(&timer); printf("%f s\n",elapsedTime(timer));
 
     //printf("v0: %f, %f\n",v0_d[0],v0_d[1]);
     //invoke kernel here
 
-    printf("running the kernel....\n");
+    printf("running the kernel....\n"); fflush(stdout);
+    startTime(&timer);
+
 
     basicTriRast(framebuffer_device, x0_d, x1_d, x2_d, y0_d, y1_d, y2_d, w, h, num_triangles);
 
+    stopTime(&timer); 
+    printf("execution time of kernel for %d triangle/s: ", num_triangles);
+    printf("%f s\n",elapsedTime(timer));
+    //std::cout << "execution time of kernel for " << num_triangles << " amount of triangles: " << (float)elapsedTime(timer) << std::endl;
 
     cuda_ret = cudaDeviceSynchronize();
 	if(cuda_ret != cudaSuccess) FATAL("Unable to launch kernel"); fflush(stdout);
@@ -123,7 +134,7 @@ int main(int argc, char * argv[]){
     //verify results below
 
     std::ofstream ofs; 
-    ofs.open("./raster2d.ppm"); 
+    ofs.open("./raster2d_gpu.ppm"); 
     ofs << "P6\n" << w << " " << h << "\n255\n"; 
     ofs.write((char*)framebuffer, w * h * 3); 
     ofs.close();

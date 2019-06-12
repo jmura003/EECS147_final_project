@@ -1,4 +1,4 @@
-CC=nvcc
+CC=nvcc 
 #ARCH=-arch=sm_52
 SOURCES=main.cu
 OBJECTS=$(SOURCES:.cpp=.o)
@@ -9,5 +9,5 @@ $(EXECUTABLE): $(OBJECTS)
 	$(CC) $(ARCH) $(OBJECTS) -o $@
 .PHONY : clean
 clean :
-	-rm $(EXECUTABLE) raster2d.ppm framebuffer.txt
+	-rm $(EXECUTABLE) *.ppm 
 
