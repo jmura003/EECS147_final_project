@@ -7,12 +7,13 @@
 #include <fstream> 
 #include <string.h>
 #include <time.h>
+#include <chrono>
  
 typedef float Vec2[2]; 
 typedef float Vec3[3]; 
 typedef unsigned char Rgb[3];
 
-using namespace std;
+using namespace std::chrono;
  
 inline 
 float edgeFunction(const Vec2 &a, const Vec2 &b, const Vec2 &c) 
@@ -70,6 +71,9 @@ int main(int argc, char **argv)
     memset(framebuffer, 0x0, w * h * 3); 
  
     //std::cout << "area: " << area << endl;
+
+    auto start = high_resolution_clock::now();
+
     for(int k = 0; k < num_triangles; k++){
         Vec2 v0 = {x0[k], y0[k]}; 
         Vec2 v1 = {x1[k], y1[k]}; 
@@ -102,10 +106,15 @@ int main(int argc, char **argv)
             } 
         }
     } 
+    auto stop = high_resolution_clock::now();
 
+    auto duration = duration_cast<microseconds>(stop-start);
+
+    std::cout << "time on cpu for " << num_triangles << " triangles: ";
+    std::cout << duration.count() << " micro seconds" << std::endl;
  
     std::ofstream ofs; 
-    ofs.open("./raster2d_cpi.ppm"); 
+    ofs.open("./raster2d_cpu.ppm"); 
     ofs << "P6\n" << w << " " << h << "\n255\n"; 
     ofs.write((char*)framebuffer, w * h * 3); 
     ofs.close(); 
