@@ -35,7 +35,7 @@ def makeTriangles(n, w, h): #Does not prevent creating duplicate triangles
 		else:
 			if i == 0:
 				i = 0
-			else
+			else:
 				i = i - 1
 	npTriangles = np.array(triangles, dtype=np.float64)
 	return
