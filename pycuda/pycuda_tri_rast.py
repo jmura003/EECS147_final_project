@@ -65,16 +65,31 @@ triangles = []
 # PPM file header
 ppm_header = 'P6 ' + str(w) + ' ' + str(h) + ' ' + str(maxval) + '\n'
 
+def edgeFunction(a,b,c):
+    return (c[0] - a[0]) * (b[1] - a[1]) - (c[1] - a[1]) * (b[0] - a[0])
+
 def makeTriangles(n, w, h): #Does not prevent creating duplicate triangles
 	#n determines number of triangles within a w x h image to generate in an array
 
     global triangles
     for i in range(0, n):
-        for j in range(0, 3):
-            x = random.uniform(0, w)
-            y = random.uniform(0, h)
-            triangles.append(x)
-            triangles.append(y)
+        check = [[0,0],[0,0],[0,0]]
+        checkVal = 0
+        while checkVal == 0:
+            for j in range(0, 3):
+                x = random.uniform(0, w)
+                y = random.uniform(0, h)
+                # triangles.append(x)
+                # triangles.append(y)
+                check[j] = [x,y]
+
+            if edgeFunction(check[0], check[1], check[2]) >= 0:
+                checkVal = 1
+
+        for k in range(0, 3):
+            for l in range(0, 2):
+                triangles.append(check[k][l])
+
     npTriangles = numpy.array(triangles, dtype=numpy.float32)
     return npTriangles
 
@@ -85,11 +100,11 @@ sync = pycuda.driver.Stream()
 func = mod.get_function("rasterizePixel")
 gridParam = int(math.ceil(512/32))
 
-start = time.time()
-
 sizeInput = input("Enter the number of triangles: ")
 trianglesParam = makeTriangles(sizeInput, 512, 512)
+
 size = numpy.int32(sizeInput)
+start = time.time()
 func(cuda.InOut(trianglesParam), cuda.InOut(image), size, grid=(gridParam, gridParam, 1), block=(32,32,1))
 sync.synchronize();
 
