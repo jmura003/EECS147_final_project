@@ -33,7 +33,10 @@ def makeTriangles(n, w, h): #Does not prevent creating duplicate triangles
 		if edgeFunction(vertices[0], vertices[1], vertices[2] > 0:	
 			triangles.append(vertices)
 		else:
-			n--
+			if i == 0:
+				i = 0
+			else
+				i = i - 1
 	npTriangles = np.array(triangles, dtype=np.float64)
 	return
 
