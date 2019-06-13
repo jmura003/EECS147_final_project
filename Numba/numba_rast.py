@@ -30,7 +30,7 @@ def makeTriangles(n, w, h): #Does not prevent creating duplicate triangles
 			x = random.uniform(0, w)
 			y = random.uniform(0, h)
 			vertices.append([x, y]) #add one vertex out of 3
-		if edgeFunction(vertices[0], vertices[1], vertices[2] > 0:	
+		if edgeFunction(vertices[0], vertices[1], vertices[2]) > 0:	
 			triangles.append(vertices)
 		else:
 			if i == 0:
